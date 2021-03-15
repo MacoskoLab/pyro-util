@@ -10,8 +10,8 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from torch.utils.data import DataLoader, Dataset, TensorDataset
 from torch.utils.data.sampler import SubsetRandomSampler, BatchSampler
 
-from .cupy import CupySparseDataLoader, CupySparseDataset
-from .target import DataTargetLoader, TensorTargetDataset
+from pyro_util.data.cupy import CupySparseDataLoader, CupySparseDataset
+from pyro_util.data.target import DataTargetLoader, TensorTargetDataset
 
 
 class StratifiedSubsetSampler(BatchSampler):

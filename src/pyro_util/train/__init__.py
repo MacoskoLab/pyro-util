@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 import pyro.infer as pi
 import pyro.optim as po
 
-from drvish.train.aggmo import AggMo
+from pyro_util.train.aggmo import AggMo
 
 
 PyroAggMo = (

@@ -1,6 +1,6 @@
 from torch.utils.data import DataLoader, TensorDataset
 
-from drvish.data.cupy import CupySparseDataLoader, CupySparseDataset
+from pyro_util.data.cupy import CupySparseDataLoader, CupySparseDataset
 
 
 class TargetMixin:
