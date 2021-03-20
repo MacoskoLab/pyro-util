@@ -1,7 +1,5 @@
 from torch.utils.data import DataLoader, TensorDataset
 
-from pyro_util.data.cupy import CupySparseDataLoader, CupySparseDataset
-
 
 class TargetMixin:
     """
@@ -18,10 +16,6 @@ class TensorTargetDataset(TargetMixin, TensorDataset):
     ...
 
 
-class CupySparseTargetDataset(TargetMixin, CupySparseDataset):
-    ...
-
-
 class TargetLoaderMixin:
     """
     When combined with a TargetMixin-derived class, this mixin will append the target
@@ -35,8 +29,4 @@ class TargetLoaderMixin:
 
 
 class DataTargetLoader(TargetLoaderMixin, DataLoader):
-    ...
-
-
-class CupySparseTargetLoader(TargetLoaderMixin, CupySparseDataLoader):
     ...

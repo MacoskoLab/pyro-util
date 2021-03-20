@@ -1,10 +1,10 @@
+import cupy
 import torch
-
-if torch.cuda.is_available():
-    import cupy
 
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.dlpack import from_dlpack
+
+from pyro_util.data.target import TargetMixin, TargetLoaderMixin
 
 
 class CupySparseDataset(Dataset):
@@ -27,6 +27,10 @@ class CupySparseDataset(Dataset):
         return self.arrays[0].shape[0]
 
 
+class CupySparseTargetDataset(TargetMixin, CupySparseDataset):
+    ...
+
+
 class CupySparseDataLoader(DataLoader):
     """
     DataLoader that converts from sparse cupy array to a dense tensor. For large
@@ -41,3 +45,7 @@ class CupySparseDataLoader(DataLoader):
                 else t[indices]
                 for t in self.dataset.arrays
             ]
+
+
+class CupySparseTargetLoader(TargetLoaderMixin, CupySparseDataLoader):
+    ...
