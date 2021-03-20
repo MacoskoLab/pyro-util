@@ -130,3 +130,25 @@ def split_labeled_dataset(
     )
 
     return data_loader_train, data_loader_validation
+
+
+def dataset_with_indices(cls):
+    """
+    Modifies the given Dataset class to return a tuple data, target, index
+    instead of just data, target.
+
+    Adapted from post by Cassidy Laidlaw:
+        https://discuss.pytorch.org/t/how-to-retrieve-the-sample-indices-of-a-mini-batch/7948/19
+    """
+
+    def __getitem__(self, index):
+        data = cls.__getitem__(self, index)
+        return [*data, index]
+
+    return type(
+        cls.__name__,
+        (cls,),
+        {
+            "__getitem__": __getitem__,
+        },
+    )
