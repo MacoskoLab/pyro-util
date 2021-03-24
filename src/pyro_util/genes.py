@@ -10,7 +10,7 @@ def poisson_fit(umis: Union[np.ndarray, scipy.sparse.spmatrix]) -> np.ndarray:
     distribution representing even expression across all cells.
 
     :param umis: Unscaled UMI counts for ``n_cells * n_genes``
-    :return: An array of p-values of size ``n_genes``
+    :return: An array of logp-values of size ``n_genes``
     """
     if not scipy.sparse.issparse(umis):
         kwargs = {"keepdims": True}
@@ -30,7 +30,9 @@ def poisson_fit(umis: Union[np.ndarray, scipy.sparse.spmatrix]) -> np.ndarray:
 
     exp_p = np.ones_like(pct)
     ix = np.asarray(std_pct_nz != 0).flatten()
-    exp_p[ix] = scipy.stats.norm.cdf(pct[ix], loc=exp_pct_nz[ix], scale=std_pct_nz[ix])
+    exp_p[ix] = scipy.stats.norm.logcdf(
+        pct[ix], loc=exp_pct_nz[ix], scale=std_pct_nz[ix]
+    )
 
     return exp_p
 
