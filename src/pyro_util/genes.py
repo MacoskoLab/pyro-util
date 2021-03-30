@@ -28,7 +28,7 @@ def poisson_fit(umis: Union[np.ndarray, scipy.sparse.spmatrix]) -> np.ndarray:
     var_pct_nz = np.asarray((prob_zero * (1 - prob_zero)).mean(1)).flatten() / n_cells
     std_pct_nz = np.sqrt(var_pct_nz)
 
-    exp_p = np.ones_like(pct)
+    exp_p = np.full_like(pct, np.log(0.5))
     ix = np.asarray(std_pct_nz != 0).flatten()
     exp_p[ix] = scipy.stats.norm.logcdf(
         pct[ix], loc=exp_pct_nz[ix], scale=std_pct_nz[ix]
