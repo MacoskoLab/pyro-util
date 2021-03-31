@@ -18,18 +18,18 @@ def poisson_fit(umis: Union[np.ndarray, scipy.sparse.spmatrix]) -> np.ndarray:
         kwargs = {}
 
     n_cells = umis.shape[0]
-    pct = np.asarray(((umis > 0).sum(0) / n_cells)).flatten()
+    pct = np.ravel((umis > 0).sum(0)) / n_cells
     exp = umis.sum(0, **kwargs) / umis.sum()
     numis = umis.sum(1, **kwargs)
 
     prob_zero = np.asarray(np.exp(-np.dot(exp.T, numis.T)))
-    exp_pct_nz = np.asarray((1 - prob_zero).mean(1)).flatten()
+    exp_pct_nz = np.ravel((1 - prob_zero).mean(1))
 
-    var_pct_nz = np.asarray((prob_zero * (1 - prob_zero)).mean(1)).flatten() / n_cells
+    var_pct_nz = np.ravel((prob_zero * (1 - prob_zero)).mean(1)) / n_cells
     std_pct_nz = np.sqrt(var_pct_nz)
 
     exp_p = np.full_like(pct, np.log(0.5))
-    ix = np.asarray(std_pct_nz != 0).flatten()
+    ix = std_pct_nz != 0
     exp_p[ix] = scipy.stats.norm.logcdf(
         pct[ix], loc=exp_pct_nz[ix], scale=std_pct_nz[ix]
     )
@@ -62,9 +62,9 @@ def binomial_deviance(umis: Union[np.ndarray, scipy.sparse.spmatrix]) -> np.ndar
 
         ll_sat = umis.copy()
         ll_sat.data *= np.log(P.data) - L1P.data
-        ll_sat = np.asarray((ll_sat + L1P.multiply(n_i)).sum(axis=0)).squeeze()
+        ll_sat = np.ravel((ll_sat + L1P.multiply(n_i)).sum(axis=0))
 
-    feature_sums = np.asarray(umis.sum(0)).squeeze()
+    feature_sums = np.ravel(umis.sum(0))
 
     n = n_i.sum()
 
