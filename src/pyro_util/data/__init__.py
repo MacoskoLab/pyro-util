@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import List, Type
+from typing import Any, Dict, List, Type
 
 import numpy as np
 
@@ -61,6 +61,7 @@ def split_dataset(
     train_p: float,
     dataset_cls: Type[Dataset] = TensorDataset,
     dataloader_cls: Type[DataLoader] = DataLoader,
+    **dataloader_kwargs: Dict[str, Any],
 ):
     """
     Split a dataset of tensors into training and validation sets with a given split.
@@ -83,12 +84,14 @@ def split_dataset(
         dataset=dataset,
         batch_size=batch_size,
         sampler=SubsetRandomSampler(example_indices[:n_train]),
+        **dataloader_kwargs,
     )
 
     data_loader_validation = dataloader_cls(
         dataset=dataset,
         batch_size=batch_size,
         sampler=SubsetRandomSampler(example_indices[n_train:]),
+        **dataloader_kwargs,
     )
 
     return data_loader_train, data_loader_validation
@@ -102,6 +105,7 @@ def split_labeled_dataset(
     train_p: float,
     dataset_cls: Type[Dataset] = TensorTargetDataset,
     dataloader_cls: Type[DataLoader] = DataTargetLoader,
+    **dataloader_kwargs: Dict[str, Any],
 ):
     """
     Split a labeled dataset of tensors into training and validation sets, and provide
@@ -129,6 +133,7 @@ def split_labeled_dataset(
         batch_sampler=StratifiedSubsetSampler(
             example_indices[:n_train], example_labels[:n_train], batch_size
         ),
+        **dataloader_kwargs,
     )
 
     data_loader_validation = dataloader_cls(
@@ -136,6 +141,7 @@ def split_labeled_dataset(
         batch_sampler=StratifiedSubsetSampler(
             example_indices[n_train:], example_labels[n_train:], batch_size
         ),
+        **dataloader_kwargs,
     )
 
     return data_loader_train, data_loader_validation
