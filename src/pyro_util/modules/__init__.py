@@ -10,7 +10,7 @@ T = torch.Tensor
 NORM_MODE = Literal["batch_norm", "weight_scaling", None]
 
 
-def make_fc(dims: Sequence[int], norm_mode: NORM_MODE) -> nn.Module:
+def make_fc(dims: Sequence[int], norm_mode: NORM_MODE = "batch_norm") -> nn.Module:
     """Helper function for creating a fully connected neural network.
     Each layer consists of ReLU activation feeding into a linear layer.
     If norm_mode is "batch_norm" then batch normalization is applied before
