@@ -4,14 +4,11 @@ import itertools
 from typing import Callable, List, Tuple
 
 import numpy as np
-
-from torch.utils.data import DataLoader
-
 import pyro.infer as pi
 import pyro.optim as po
+from torch.utils.data import DataLoader
 
 from pyro_util.train.aggmo import AggMo
-
 
 PyroAggMo = (
     lambda _Optim: lambda optim_args, clip_args=None: po.PyroOptim(

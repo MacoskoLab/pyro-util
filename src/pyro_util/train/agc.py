@@ -1,9 +1,9 @@
+from typing import Iterable, Union
+
 import torch
+from pyro.optim import PyroOptim
 from torch._six import inf
 from torch.nn.utils import clip_grad_norm_, clip_grad_value_
-from typing import Union, Iterable
-
-from pyro.optim import PyroOptim
 
 _tensor_or_tensors = Union[torch.Tensor, Iterable[torch.Tensor]]
 

@@ -1,10 +1,9 @@
 import cupy
 import torch
-
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.dlpack import from_dlpack
 
-from pyro_util.data.target import TargetMixin, TargetLoaderMixin
+from pyro_util.data.target import TargetLoaderMixin, TargetMixin
 
 
 class CupySparseDataset(Dataset):

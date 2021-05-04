@@ -3,12 +3,10 @@
 from typing import Any, Dict, List, Type
 
 import numpy as np
-
 import torch
-
 from sklearn.model_selection import StratifiedShuffleSplit
 from torch.utils.data import DataLoader, Dataset, TensorDataset
-from torch.utils.data.sampler import SubsetRandomSampler, BatchSampler
+from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 
 from pyro_util.data.target import DataTargetLoader, TensorTargetDataset
 
@@ -16,8 +14,8 @@ try:
     from pyro_util.data.cupy import (
         CupySparseDataLoader,
         CupySparseDataset,
-        CupySparseTargetLoader,
         CupySparseTargetDataset,
+        CupySparseTargetLoader,
     )
 except ImportError:
     pass
