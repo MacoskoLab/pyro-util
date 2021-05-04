@@ -1,32 +1,38 @@
-from typing import Sequence, Tuple, Type
+from typing import Literal, Sequence, Tuple
 
 import torch
 import torch.nn as nn
-
 from pyro.distributions.util import broadcast_shape
 
+from pyro_util.modules.weight_scaling import GammaReLU, WSLinear
+
 T = torch.Tensor
+NORM_MODE = Literal["batch_norm", "weight_scaling", None]
 
 
-def make_fc(
-    dims: Sequence[int], activation: Type[nn.Module] = nn.ReLU, batch_norm: bool = True
-) -> nn.Module:
-    """Helper function for creating a fully connected neural network. Each layer is made up of
-    an optional BatchNorm, an activation function, and a linear layer.
+def make_fc(dims: Sequence[int], norm_mode: NORM_MODE) -> nn.Module:
+    """Helper function for creating a fully connected neural network.
+    Each layer consists of ReLU activation feeding into a linear layer.
+    If norm_mode is "batch_norm" then batch normalization is applied before
+    activation, while if norm_mode is "weight_scaling" a weight-scaled linear
+    layer is used and a scaled ReLU is used instead of the regular ReLU.
 
     :param dims: The size of the layers in the network
-    :param activation: Activation layer to use
-    :param batch_norm: Whether to use nn.BatchNorm1d before activation
+    :param norm_mode: either "batch_norm", "weight_scaling", or None for no norm
     :return: nn.Sequential containing all the layers
     """
 
     layers = []
 
     for in_dim, out_dim in zip(dims, dims[1:]):
-        if batch_norm:
+        if norm_mode == "batch_norm":
             layers.append(nn.BatchNorm1d(in_dim))
-        layers.append(activation())
-        layers.append(nn.Linear(in_dim, out_dim))
+        if norm_mode == "weight_scaling":
+            layers.append(GammaReLU())
+            layers.append(WSLinear(in_dim, out_dim))
+        else:
+            layers.append(nn.ReLU())
+            layers.append(nn.Linear(in_dim, out_dim))
 
     return nn.Sequential(*layers)
 
