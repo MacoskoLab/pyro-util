@@ -25,16 +25,20 @@ def make_fc(dims: Sequence[int], norm_mode: NORM_MODE = "batch_norm") -> nn.Modu
     layers = []
 
     for in_dim, out_dim in zip(dims, dims[1:]):
-        if norm_mode == "batch_norm":
-            layers.append(nn.BatchNorm1d(in_dim))
         if norm_mode == "weight_scaling":
-            layers.append(GammaReLU())
             layers.append(WSLinear(in_dim, out_dim))
         else:
-            layers.append(nn.ReLU())
             layers.append(nn.Linear(in_dim, out_dim))
 
-    return nn.Sequential(*layers)
+        if norm_mode == "batch_norm":
+            layers.append(nn.BatchNorm1d(out_dim))
+
+        if norm_mode == "weight_scaling":
+            layers.append(GammaReLU())
+        else:
+            layers.append(nn.ReLU())
+
+    return nn.Sequential(*layers[:-1])
 
 
 def split_in_half(t: T) -> Tuple[T, T]:
