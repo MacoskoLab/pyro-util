@@ -1,4 +1,4 @@
-from typing import Literal, Sequence, Tuple
+from typing import Tuple
 
 import torch
 import torch.nn as nn
@@ -7,38 +7,41 @@ from pyro.distributions.util import broadcast_shape
 from pyro_util.modules.weight_scaling import GammaReLU, WSLinear
 
 T = torch.Tensor
-NORM_MODE = Literal["batch_norm", "weight_scaling", None]
 
 
-def make_fc(dims: Sequence[int], norm_mode: NORM_MODE = "batch_norm") -> nn.Module:
+def make_ws_fc(*dims: int) -> nn.Module:
     """Helper function for creating a fully connected neural network.
-    Each layer consists of ReLU activation feeding into a linear layer.
-    If norm_mode is "batch_norm" then batch normalization is applied before
-    activation, while if norm_mode is "weight_scaling" a weight-scaled linear
-    layer is used and a scaled ReLU is used instead of the regular ReLU.
+    This version uses weight-scaled linear layers and gamma-scaled ReLU
 
-    :param dims: The size of the layers in the network
-    :param norm_mode: either "batch_norm", "weight_scaling", or None for no norm
+    :param dims: The size of the layers in the network (at least 2)
     :return: nn.Sequential containing all the layers
     """
 
-    layers = []
+    layers = [WSLinear(dims[0], dims[1])]
 
-    for in_dim, out_dim in zip(dims, dims[1:]):
-        if norm_mode == "weight_scaling":
-            layers.append(WSLinear(in_dim, out_dim))
-        else:
-            layers.append(nn.Linear(in_dim, out_dim))
+    for in_dim, out_dim in zip(dims[1:], dims[2:]):
+        layers.append(GammaReLU())
+        layers.append(WSLinear(in_dim, out_dim))
 
-        if norm_mode == "batch_norm":
-            layers.append(nn.BatchNorm1d(out_dim))
+    return nn.Sequential(*layers)
 
-        if norm_mode == "weight_scaling":
-            layers.append(GammaReLU())
-        else:
-            layers.append(nn.ReLU())
 
-    return nn.Sequential(*layers[:-1])
+def make_bn_fc(*dims: int) -> nn.Module:
+    """Helper function for creating a fully connected neural network.
+    This version uses BatchNorm between linear layers.
+
+    :param dims: The size of the layers in the network (at least 2)
+    :return: nn.Sequential containing all the layers
+    """
+
+    layers = [nn.Linear(dims[0], dims[1])]
+
+    for in_dim, out_dim in zip(dims[1:], dims[2:]):
+        layers.append(nn.BatchNorm1d(in_dim))
+        layers.append(nn.ReLU())
+        layers.append(nn.Linear(in_dim, out_dim))
+
+    return nn.Sequential(*layers)
 
 
 def split_in_half(t: T) -> Tuple[T, T]:

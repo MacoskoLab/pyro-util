@@ -23,7 +23,7 @@ class WSLinear(nn.Linear):
         super().__init__(in_features, out_features, bias)
 
         nn.init.kaiming_normal_(self.weight)
-        self.gain = nn.Parameter(torch.ones(self.weight.size(0), requires_grad=True))
+        self.gain = nn.Parameter(torch.ones(self.weight.size()[0], requires_grad=True))
 
     def standardize_weight(self, eps=1e-6):
         mean = torch.mean(self.weight, dim=(1,), keepdim=True)
