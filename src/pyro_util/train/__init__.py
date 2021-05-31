@@ -6,15 +6,21 @@ from typing import Callable, List, Tuple
 import numpy as np
 import pyro.infer as pi
 import pyro.optim as po
+import torch
 from torch.utils.data import DataLoader
 
+from pyro_util.train.agc import clip_grad_w_agc
 from pyro_util.train.aggmo import AggMo
 
+# create a Pyro version of the AggMo optimizer for standalone use
 PyroAggMo = (
     lambda _Optim: lambda optim_args, clip_args=None: po.PyroOptim(
         _Optim, optim_args, clip_args
     )
 )(AggMo)
+
+# monkey-patch AGC into Pyro's gradient-clipping logic
+po.PyroOptim._clip_grad = staticmethod(clip_grad_w_agc)
 
 
 def evaluate_epoch(
@@ -38,7 +44,15 @@ def evaluate_epoch(
     # do a training epoch over each mini-batch x returned by the data loader
     for xs in data_loader:
         if use_cuda:
-            xs = (x.cuda() for x in xs)
+            cu_xs = []
+            for x in xs:
+                if isinstance(x, torch.Tensor):
+                    cu_xs.append(x.cuda())
+                elif isinstance(x, list):
+                    cu_xs.append([t.cuda() for t in x])
+                else:
+                    raise ValueError("Input must be tensors and/or lists of tensors")
+            xs = cu_xs
 
         # do ELBO gradient and accumulate loss
         epoch_loss += eval_fn(*xs)

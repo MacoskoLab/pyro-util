@@ -1,7 +1,6 @@
 from typing import Iterable, Union
 
 import torch
-from pyro.optim import PyroOptim
 from torch._six import inf
 from torch.nn.utils import clip_grad_norm_, clip_grad_value_
 
@@ -68,6 +67,3 @@ def clip_grad_w_agc(params, clip_norm=None, clip_value=None, clip_agc=None):
         clip_grad_value_(params, clip_value)
     if clip_agc is not None:
         clip_grad_agc_(params, clip_agc)
-
-
-PyroOptim._clip_grad = staticmethod(clip_grad_w_agc)
